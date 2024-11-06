@@ -49,9 +49,9 @@ class CommentController extends Controller {
 
         $data = [
             'admin_id' => $this->user()->id,
-            'vendor_id' => $this->integer($req->vendor_id),
+            'blog_id' => $blog->id,
+            'vendor_id' => $blog->vendor_id,
             'client_id' => $this->integer($req->client_id),
-            'blog_id' => $this->integer($req->blog_id),
             'content' => $this->string($req->content),
             'allow_replies' => $this->bool($req->allow_replies),
             'allow' => $this->bool($req->allow),

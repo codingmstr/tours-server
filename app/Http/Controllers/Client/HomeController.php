@@ -175,6 +175,7 @@ class HomeController extends Controller {
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->longitude) . ', ' . $this->string($req->latitude),
+            'postal' => $this->string($req->postal),
             'content' => $this->string($req->content),
             'active' => true,
             'ip' => $req->ip(),

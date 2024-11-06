@@ -14,11 +14,12 @@ use App\Events\ChatBox;
 
 class MessageController extends Controller {
 
-    public function _active_ ( $user ) {
+    public function _active_ ( $user, $product ) {
 
         Message::where('receiver_id', $this->user()->id)
             ->where('sender_id', $user->id)
             ->where('removed_receiver', false)
+            ->where('product_id', $product->id)
             ->where('readen', false)
             ->update(['readen' => true, 'readen_at' => $this->date()]);
         
@@ -42,7 +43,8 @@ class MessageController extends Controller {
 
         if ( !$product->active || !$user->active ) return $this->failed();
       
-        self::_active_($user);
+        self::_active_($user, $product);
+
         $messages = Message::where('sender_id', $this->user()->id)
                         ->where('receiver_id', $user->id)
                         ->where('removed_sender', false)
@@ -78,6 +80,12 @@ class MessageController extends Controller {
         $message = MessageResource::make( Message::find($message->id) );
         event(new ChatBox($this->user()->id, $user->id, 'message', UserResource::make($user), $message));
         return $this->success(['message' => $message]);
+
+    }
+    public function active ( Request $req, User $user, Product $product ) {
+
+        self::_active_($user, $product);
+        return $this->success();
 
     }
 

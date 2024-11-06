@@ -25,6 +25,10 @@ return new class extends Migration {
             $table->string('city')->nullable();
             $table->string('street')->nullable();
             $table->string('location')->nullable();
+            $table->string('postal')->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('currency')->nullable();
             $table->string('notes')->nullable();
             $table->string('secret_key')->unique();
             $table->float('price')->default(0);

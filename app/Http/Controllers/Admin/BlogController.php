@@ -7,7 +7,6 @@ use App\Http\Resources\BlogResource;
 use App\Models\Blog;
 use App\Models\Comment;
 use App\Models\Reply;
-use App\Models\Review;
 
 class BlogController extends Controller {
 
@@ -88,6 +87,12 @@ class BlogController extends Controller {
             'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
+        if ( $blog->vendor_id !== $this->integer($req->vendor_id) ) {
+
+            Comment::withTrashed()->where('vendor_id', $blog->vendor_id)->update(['vendor_id' => $this->integer($req->vendor_id)]);
+            Reply::withTrashed()->where('vendor_id', $blog->vendor_id)->update(['vendor_id' => $this->integer($req->vendor_id)]);
+
+        }
 
         $blog->update($data);
         $this->upload_files( $req->allFiles(), 'blog', $blog->id );

@@ -32,6 +32,9 @@ class SettingController extends Controller {
     public function update ( Request $req ) {
 
         $setting = Setting::find(1);
+        if ( !$setting ) return $this->failed();
+
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
 
         $data = [
             'name' => $this->string($req->name),
@@ -42,12 +45,15 @@ class SettingController extends Controller {
             'company' => $this->string($req->company),
             'code' => $this->string($req->code),
             'language' => $this->string($req->language),
-            'currency' => $this->string($req->currency),
             'theme' => $this->string($req->theme),
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'currency' => $this->string($req->currency),
+            'postal' => $this->string($req->postal),
+            'longitude' => $this->string($req->longitude) ?? $location['longitude'],
+            'latitude' => $this->string($req->latitude) ?? $location['latitude'],
             'facebook' => $this->string($req->facebook),
             'whatsapp' => $this->string($req->whatsapp),
             'youtube' => $this->string($req->youtube),

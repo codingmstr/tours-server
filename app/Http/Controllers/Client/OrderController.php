@@ -47,7 +47,8 @@ class OrderController extends Controller {
         if ( $product->vendor && !$product->vendor?->allow_orders ) return $this->failed();
 
         $coupon = Coupon::where('name', $req->coupon)->where('active', true)->where('allow_orders', true)->first();
-        $price = self::discount( $product, $coupon ) ?? $product->new_price;
+        $price = self::discount( $product, $coupon );
+        $price = $price ? $price : $product->new_price;
         $secret_key = $this->random_key();
         $paid = false;
         $paid_at = null;
@@ -59,9 +60,22 @@ class OrderController extends Controller {
         }
         if ( $this->bool($req->pay_now) ) {
 
-            $balance = $this->user()->balance;
+            $balance = $this->user()->buy_balance + $this->user()->withdraw_balance;
             if ( $price > $balance ) return $this->failed(['balance' => 'not enouph']);
-            $this->user()->update(['balance' => $balance - $price]);
+
+            if ( $this->user()->buy_balance < $price ) {
+
+                $buy_price = $price - $this->user()->buy_balance;
+                $this->user()->update(['withdraw_balance' => $this->user()->withdraw_balance - $buy_price]);
+                $this->user()->update(['buy_balance' => 0]);
+
+            }
+            else {
+                
+                $this->user()->update(['buy_balance' => $this->user()->buy_balance - $price]);
+
+            }
+
             $paid = true;
             $paid_at = date('Y-m-d H:i:s');
 

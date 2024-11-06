@@ -44,15 +44,7 @@ class ProductController extends Controller {
 
         $data = $this->paginate( Product::query(), $req );
         $items = ProductResource::collection( $data['items'] );
-
-        $tags = [
-            'total' => $data['total'],
-            'orders' => Order::query()->count(),
-            'reviews' => Review::query()->count(),
-            'coupons' => Coupon::query()->count(),
-        ];
-        
-        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Product $product ) {
@@ -68,8 +60,8 @@ class ProductController extends Controller {
 
         $data = [
             'admin_id' => $this->user()->id,
-            'vendor_id' => $this->integer($req->vendor_id),
             'category_id' => $this->integer($req->category_id),
+            'vendor_id' => $this->integer($req->vendor_id),
             'name' => $this->string($req->name),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
@@ -86,12 +78,23 @@ class ProductController extends Controller {
             'description' => $this->string($req->description),
             'details' => $this->string($req->details),
             'policy' => $this->string($req->policy),
+            'meeting' => $this->string($req->meeting),
+            'rules' => $this->string($req->rules),
+            'availability' => $this->string($req->availability),
+            'more_info' => $this->string($req->more_info),
+            'includes' => $this->string($req->includes),
+            'expected' => $this->string($req->expected),
+            'days' => $this->string($req->days),
+            'times' => $this->string($req->times),
             'notes' => $this->string($req->notes),
-            'includes' => $req->includes,
-            'rate' => $this->float($req->rate),
+            'duration' => $this->integer($req->duration),
+            'max_persons' => $this->integer($req->max_persons),
+            'max_orders' => $this->integer($req->max_orders),
+            'pay_later' => $this->bool($req->pay_later),
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow_cancel' => $this->bool($req->allow_cancel),
             'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
@@ -125,15 +128,33 @@ class ProductController extends Controller {
             'description' => $this->string($req->description),
             'details' => $this->string($req->details),
             'policy' => $this->string($req->policy),
+            'meeting' => $this->string($req->meeting),
+            'rules' => $this->string($req->rules),
+            'availability' => $this->string($req->availability),
+            'more_info' => $this->string($req->more_info),
+            'includes' => $this->string($req->includes),
+            'expected' => $this->string($req->expected),
+            'days' => $this->string($req->days),
+            'times' => $this->string($req->times),
             'notes' => $this->string($req->notes),
-            'includes' => $req->includes,
-            'rate' => $this->float($req->rate),
+            'duration' => $this->integer($req->duration),
+            'max_persons' => $this->integer($req->max_persons),
+            'max_orders' => $this->integer($req->max_orders),
+            'pay_later' => $this->bool($req->pay_later),
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow_cancel' => $this->bool($req->allow_cancel),
             'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
+        if ( $product->vendor_id !== $this->integer($req->vendor_id) ) {
+
+            Coupon::withTrashed()->where('vendor_id', $product->vendor_id)->update(['vendor_id' => $this->integer($req->vendor_id)]);
+            Order::withTrashed()->where('vendor_id', $product->vendor_id)->update(['vendor_id' => $this->integer($req->vendor_id)]);
+            Review::withTrashed()->where('vendor_id', $product->vendor_id)->update(['vendor_id' => $this->integer($req->vendor_id)]);
+
+        }
 
         $product->update($data);
         $this->upload_files( $req->allFiles(), 'product', $product->id );

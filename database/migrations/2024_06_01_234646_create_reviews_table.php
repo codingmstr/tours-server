@@ -8,7 +8,7 @@ return new class extends Migration {
 
     public function up () {
 
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('reviews', function ( Blueprint $table ) {
             $table->id();
             $table->integer('admin_id')->default(0);
             $table->integer('vendor_id')->default(0);

@@ -22,6 +22,9 @@ return new class extends Migration {
             $table->string('language')->nullable();
             $table->string('company')->nullable();
             $table->string('code')->nullable();
+            $table->string('postal')->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
             $table->string('currency')->nullable();
             $table->string('theme')->nullable();
             $table->string('facebook')->nullable();

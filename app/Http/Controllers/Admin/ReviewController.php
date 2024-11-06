@@ -48,9 +48,9 @@ class ReviewController extends Controller {
 
         $data = [
             'admin_id' => $this->user()->id,
-            'vendor_id' => $this->integer($req->vendor_id),
+            'product_id' => $product->id,
+            'vendor_id' => $product->vendor_id,
             'client_id' => $this->integer($req->client_id),
-            'product_id' => $this->integer($req->product_id),
             'content' => $this->string($req->content),
             'rate' => $this->float($req->rate),
             'allow' => $this->bool($req->allow),

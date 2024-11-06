@@ -29,17 +29,32 @@ class Product extends Model {
         'description',
         'details',
         'policy',
+        'meeting',
+        'rules',
+        'availability',
+        'more_info',
         'includes',
+        'expected',
+        'days',
+        'times',
         'notes',
-        'rate',
+        'duration',
+        'max_persons',
+        'max_orders',
+        'views',
+        'pay_later',
         'allow_reviews',
         'allow_orders',
         'allow_coupons',
+        'allow_cancel',
         'allow',
         'active',
     ];
     protected $casts = [
-        'includes' => 'json'
+        'includes' => 'json',
+        'expected' => 'json',
+        'days' => 'json',
+        'times' => 'json',
     ];
 
     public function admin () {

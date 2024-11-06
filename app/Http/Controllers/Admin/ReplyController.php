@@ -54,10 +54,10 @@ class ReplyController extends Controller {
 
         $data = [
             'admin_id' => $this->user()->id,
-            'vendor_id' => $this->integer($req->vendor_id),
+            'comment_id' => $comment->id,
+            'blog_id' => $comment->blog_id,
+            'vendor_id' => $comment->vendor_id,
             'client_id' => $this->integer($req->client_id),
-            'comment_id' => $this->integer($req->comment_id),
-            'blog_id' => Comment::find($req->comment_id)->blog->id,
             'content' => $this->string($req->content),
             'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),

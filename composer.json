@@ -6,12 +6,16 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "devinweb/laravel-hyperpay": "^1.2",
         "laravel/framework": "^11.9",
         "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "~3.0",
-        "pusher/pusher-php-server": "^7.2"
+        "paytabscom/laravel_paytabs": "^1.8",
+        "pusher/pusher-php-server": "^7.2",
+        "srmklive/paypal": "^3.0",
+        "stripe/stripe-php": "^16.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

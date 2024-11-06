@@ -89,11 +89,13 @@ class OrderController extends Controller {
             $secret_key = $this->random_key();
         }
 
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
+
         $data = [
             'admin_id' => $this->user()->id,
-            'vendor_id' => $this->integer($req->vendor_id),
-            'client_id' => $this->integer($req->client_id),
-            'product_id' => $this->integer($req->product_id),
+            'product_id' => $product->id,
+            'client_id' => $client->id,
+            'vendor_id' => $product->vendor_id,
             'coupon_id' => $this->integer($req->coupon_id),
             'name' => $this->string($req->name),
             'email' => $this->string($req->email),
@@ -105,6 +107,10 @@ class OrderController extends Controller {
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'currency' => $this->string($req->currency),
+            'postal' => $this->string($req->postal),
+            'longitude' => $this->string($req->longitude) ?? $location['longitude'],
+            'latitude' => $this->string($req->latitude) ?? $location['latitude'],
             'notes' => $this->string($req->notes),
             'secret_key' => $secret_key,
             'price' => $price,
@@ -136,6 +142,8 @@ class OrderController extends Controller {
             $order->cancelled_at = date('Y-m-d H:i:s');
         }
 
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
+
         $data = [
             'name' => $this->string($req->name),
             'email' => $this->string($req->email),
@@ -147,6 +155,10 @@ class OrderController extends Controller {
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'currency' => $this->string($req->currency),
+            'postal' => $this->string($req->postal),
+            'longitude' => $this->string($req->longitude) ?? $location['longitude'],
+            'latitude' => $this->string($req->latitude) ?? $location['latitude'],
             'notes' => $this->string($req->notes),
             'paid' => $this->bool($req->paid),
             'ordered_at' => $this->string($req->ordered_at),

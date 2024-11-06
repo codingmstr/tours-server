@@ -5,14 +5,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\ReportResource;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Report;
 use App\Events\Notify;
+use App\Models\User;
 use App\Models\File;
+use App\Models\Transaction;
 use DateTime;
 use Vonage\Client;
 use Vonage\Client\Credentials\Basic;
 use Vonage\SMS\Message\SMS;
 use GuzzleHttp\Client as ApiClient;
+use App\Events\Payment;
 
 abstract class Controller {
 
@@ -103,6 +108,11 @@ abstract class Controller {
         return false;
 
     }
+    public function bool_string ( $value ) {
+
+        return $this->bool($value) ? 'true' : 'false';
+
+    }
     public function integer ( $value ) {
 
         return (int)$value;
@@ -161,11 +171,26 @@ abstract class Controller {
         return date('Y-m-d H:i:s');
 
     }
+    public function exchange ( $amount, $from, $to ) {
+
+        try {
+
+            $api_key = 'e56d9853c10a15d2957053fa';
+            $url = "https://v6.exchangerate-api.com/v6/{$api_key}/latest/{$from}";
+
+            $response = json_decode( file_get_contents($url), true );
+            if( $response['result'] === 'success' ) return round( $amount * $response['conversion_rates'][$to], 2 );
+
+        } catch (\Exception $e) {}
+
+        return 0;
+
+    }
     public function get_location ( $address ) {
 
-        $client = new ApiClient();
-
         try{
+
+            $client = new ApiClient();
 
             $response = $client->get('https://nominatim.openstreetmap.org/search', [
                 'query' => ['q' => $address, 'format' => 'json', 'limit' => 1, 'accept-language' => 'ar'],
@@ -181,90 +206,56 @@ abstract class Controller {
     }
     public function send_sms ( $phone, $message ) {
 
-        $api_key = "7019ef4b";
-        $sec_key = "q8SVI6913VMfCyR5";
-        $company = "Microtech";
-        $basic  = new Basic($api_key, $sec_key);
-        $client = new Client($basic);
-        $response = $client->sms()->send(new SMS($phone, $company, $message));
+        try{
 
-        return true;
+            $api_key = "7019ef4b";
+            $sec_key = "q8SVI6913VMfCyR5";
+            $company = "Microtech";
+            $basic  = new Basic($api_key, $sec_key);
+            $client = new Client($basic);
+            $response = $client->sms()->send(new SMS($phone, $company, $message));
+            return true;
+
+        } catch (\Exception $e) {}
+
+        return false;
 
     }
     public function send_whatsapp ( $phone, $message ) {
 
-        $instance_id = "instance89613";
-        $api_token = "a600sm5p56zzpfaw";
-        $client = new ApiClient();
+        try {
 
-        $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer {$api_token}",
-            ],
-            'json' => [
-                'token' => $api_token,
-                'to' => $phone,
-                'body' => $message,
-            ]
-        ]);
+            $instance_id = "instance89613";
+            $api_token = "a600sm5p56zzpfaw";
+            $client = new ApiClient();
 
-        return true;
+            $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => "Bearer {$api_token}",
+                ],
+                'json' => [
+                    'token' => $api_token,
+                    'to' => $phone,
+                    'body' => $message,
+                ]
+            ]);
 
-    }
-    public function user_table ( $req ) {
+            return true;
 
-        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
-
-        $data = [
-            'name' => $this->string($req->name),
-            'email' => $this->string($req->email),
-            'age' => $this->float($req->age),
-            'salary' => $this->float($req->salary),
-            'company' => $this->string($req->company),
-            'phone' => $this->string($req->phone),
-            'language' => $this->string($req->language),
-            'country' => $this->string($req->country),
-            'city' => $this->string($req->city),
-            'street' => $this->string($req->street),
-            'location' => "{$req->street}, {$req->city}, {$req->country}",
-            'longitude' => $location['longitude'],
-            'latitude' => $location['latitude'],
-            'currency' => $this->string($req->currency),
-            'notes' => $this->string($req->notes),
-            'allow_categories' => $this->bool($req->allow_categories),
-            'allow_products' => $this->bool($req->allow_products),
-            'allow_coupons' => $this->bool($req->allow_coupons),
-            'allow_orders' => $this->bool($req->allow_orders),
-            'allow_blogs' => $this->bool($req->allow_blogs),
-            'allow_comments' => $this->bool($req->allow_comments),
-            'allow_replies' => $this->bool($req->allow_replies),
-            'allow_reports' => $this->bool($req->allow_reports),
-            'allow_reviews' => $this->bool($req->allow_reviews),
-            'allow_contacts' => $this->bool($req->allow_contacts),
-            'allow_clients' => $this->bool($req->allow_clients),
-            'allow_vendors' => $this->bool($req->allow_vendors),
-            'allow_statistics' => $this->bool($req->allow_statistics),
-            'allow_messages' => $this->bool($req->allow_messages),
-            'allow_mails' => $this->bool($req->allow_mails),
-            'allow_login' => $this->bool($req->allow_login),
-            'allow_likes' => $this->bool($req->allow_likes),
-            'allow_dislikes' => $this->bool($req->allow_dislikes),
-            'supervisor' => $this->bool($req->supervisor),
-            'active' => $this->bool($req->active),
-        ];
-
-        return $data;
+        } catch (\Exception $e) {}
+        
+        return false;
 
     }
-    public function report ( $req, $table='', $column=0, $process='', $creator='', $data=[] ) {
+    public function report ( $req='', $table='', $column=0, $process='', $creator='', $data=[] ) {
 
         $inputs = [
             'table' => $table,
             'column' => $column,
             'process' => $process,
-            'ip' => $req->ip(),
-            'agent' => $req->userAgent(),
+            'ip' => $req?->ip(),
+            'agent' => $req?->userAgent(),
         ];
 
         if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()?->id ?? 0;
@@ -373,6 +364,120 @@ abstract class Controller {
         ];
 
         return $data;
+
+    }
+    public function user_table ( $req ) {
+
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
+
+        $data = [
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
+            'age' => $this->float($req->age),
+            'company' => $this->string($req->company),
+            'phone' => $this->string($req->phone),
+            'description' => $this->string($req->description),
+            'gender' => $this->string($req->gender),
+            'birth_date' => $this->string($req->birth_date),
+            'language' => $this->string($req->language),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => "{$req->street}, {$req->city}, {$req->country}",
+            'postal' => $this->string($req->postal),
+            'longitude' => $this->string($req->longitude) ?? $location['longitude'],
+            'latitude' => $this->string($req->latitude) ?? $location['latitude'],
+            'currency' => $this->string($req->currency),
+            'notes' => $this->string($req->notes),
+            'days' => $this->string($req->days),
+            'times' => $this->string($req->times),
+            'allow_categories' => $this->bool($req->allow_categories),
+            'allow_products' => $this->bool($req->allow_products),
+            'allow_coupons' => $this->bool($req->allow_coupons),
+            'allow_orders' => $this->bool($req->allow_orders),
+            'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
+            'allow_reports' => $this->bool($req->allow_reports),
+            'allow_reviews' => $this->bool($req->allow_reviews),
+            'allow_contacts' => $this->bool($req->allow_contacts),
+            'allow_clients' => $this->bool($req->allow_clients),
+            'allow_vendors' => $this->bool($req->allow_vendors),
+            'allow_clients_wallet' => $this->bool($req->allow_clients_wallet),
+            'allow_vendors_wallet' => $this->bool($req->allow_vendors_wallet),
+            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_messages' => $this->bool($req->allow_messages),
+            'allow_mails' => $this->bool($req->allow_mails),
+            'allow_login' => $this->bool($req->allow_login),
+            'allow_likes' => $this->bool($req->allow_likes),
+            'allow_dislikes' => $this->bool($req->allow_dislikes),
+            'supervisor' => $this->bool($req->supervisor),
+            'activate_email' => $this->bool($req->activate_email),
+            'activate_phone' => $this->bool($req->activate_phone),
+            'activate_identity' => $this->bool($req->active_identity),
+            'premium' => $this->bool($req->premium),
+            'available' => $this->bool($req->available),
+            'active' => $this->bool($req->active),
+        ];
+
+        return $data;
+
+    }
+    public function create_user ( $req, $role ) {
+
+        $validator = Validator::make($req->all(), ['email' => ['required', 'email', 'unique:users'], 'password' => ['required']]);
+        if ( $validator->fails() ) return $this->failed($validator->errors());
+        
+        $data = [
+            'role' => $role,
+            'admin_id' => $this->user()->id,
+            'password' => Hash::make($req->password),
+            'ip' => $req->ip(),
+            'agent' => $req->userAgent(),
+        ];
+
+        $user = User::create($data + $this->user_table($req));
+        $this->upload_files([$req->file('image_file')], 'user', $user->id);
+        if ( $user->role === 1 ) $this->report($req, 'admin', $user->id, 'update', 'admin');
+        if ( $user->role === 2 ) $this->report($req, 'vendor', $user->id, 'update', 'admin');
+        if ( $user->role === 3 ) $this->report($req, 'client', $user->id, 'update', 'admin');
+        return $this->success();
+
+    }
+    public function update_user ( $req, $user ) {
+
+        $validator = Validator::make($req->all(), ['email' => ['required', 'email', 'unique:users,email,' . $user->id]]);
+        if ( $validator->fails() ) return $this->failed($validator->errors());
+        if ( $req->password ) $user->password = Hash::make($req->password);
+
+        if ( $req->file('image_file') ) {
+            $file_id = File::where('table', 'user')->where('column', $user->id)->first()?->id;
+            $this->delete_files([$file_id], 'user');
+            $this->upload_files([$req->file('image_file')], 'user', $user->id);
+        }
+
+        $user->update( $this->user_table($req) );
+        if ( $user->role === 1 ) $this->report($req, 'admin', $user->id, 'update', 'admin');
+        if ( $user->role === 2 ) $this->report($req, 'vendor', $user->id, 'update', 'admin');
+        if ( $user->role === 3 ) $this->report($req, 'client', $user->id, 'update', 'admin');
+        return $this->success();
+
+    }
+    public function transaction ( $data ) {
+
+        $transaction = Transaction::where('transaction_id', $data['transaction_id'])
+            ->where('status', 'pending')
+            ->where('active', true)
+            ->firstOrFail();
+
+        $user = User::findOrFail($transaction->user_id);
+        if ( $data['completed'] ) $user->update(['buy_balance' => $user->buy_balance + $transaction->amount ]);
+
+        $transaction->update(['status' => $data['completed'] ? 'successful' : 'failed']);
+        event(new Payment($user->id, $transaction));
+        
+        $params = ['client_id' => $user->id, 'amount' => $transaction->amount, 'status' => $transaction->status];
+        $this->report(null, 'transaction', $transaction->id, 'deposit', '', $params);
 
     }
 

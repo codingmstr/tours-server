@@ -10,6 +10,9 @@ class ResetResource extends JsonResource {
 
         return [
             'id' => $this->id,
+            'token' => $this->token,
+            'user_id' => $this->user_id,
+            'user' => UserResource::make( $this->user ),
         ];
 
     }

@@ -17,6 +17,7 @@ class User extends Authenticatable {
         'name',
         'email',
         'phone',
+        'description',
         'company',
         'image',
         'password',
@@ -25,15 +26,29 @@ class User extends Authenticatable {
         'city',
         'street',
         'location',
+        'postal',
         'longitude',
         'latitude',
         'currency',
+        'gender',
+        'birth_date',
+        'withdraw_balance',
+        'pending_balance',
+        'buy_balance',
+        'withdraws',
+        'deposits',
+        'earned_points',
+        'points',
         'age',
         'ip',
         'agent',
         'notes',
-        'salary',
-        'balance',
+        'days',
+        'times',
+        'email_code',
+        'phone_code',
+        'front_id_photo',
+        'back_id_photo',
         'supervisor',
         'allow_categories',
         'allow_products',
@@ -43,6 +58,9 @@ class User extends Authenticatable {
         'allow_reports',
         'allow_contacts',
         'allow_clients',
+        'allow_vendors',
+        'allow_clients_wallet',
+        'allow_vendors_wallet',
         'allow_statistics',
         'allow_messages',
         'allow_mails',
@@ -52,6 +70,11 @@ class User extends Authenticatable {
         'allow_comments',
         'allow_replies',
         'allow_login',
+        'activate_email',
+        'activate_phone',
+        'activate_identity',
+        'premium',
+        'available',
         'active',
         'login_at',
         'remember_token',
@@ -62,6 +85,9 @@ class User extends Authenticatable {
     ];
     protected $casts = [
         'login_at' => 'datetime',
+        'birth_date' => 'datetime',
+        'days' => 'json',
+        'times' => 'json',
     ];
 
     public function admin () {
@@ -94,7 +120,6 @@ class User extends Authenticatable {
         return $this->hasMany(Reply::class, 'client_id');
 
     }
-
     public function vendor_products () {
 
         return $this->hasMany(Product::class, 'vendor_id');

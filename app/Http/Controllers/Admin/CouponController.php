@@ -54,12 +54,13 @@ class CouponController extends Controller {
     public function store ( Request $req ) {
 
         if ( Coupon::where('name', $req->name)->exists() ) return $this->failed(['name' => 'exists']);
+        $product = Product::find($req->product_id);
 
         $data = [
             'admin_id' => $this->user()->id,
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
-            'vendor_id' => $this->integer($req->vendor_id),
+            'vendor_id' => $this->integer($req->vendor_id) ? $this->integer($req->vendor_id) : $product?->vendor_id,
             'client_id' => $this->integer($req->client_id),
             'name' => $this->string($req->name),
             'discount' => $this->float($req->discount),
@@ -77,11 +78,12 @@ class CouponController extends Controller {
     public function update ( Request $req, Coupon $coupon ) {
 
         if ( Coupon::where('name', $req->name)->where('id', '!=', $coupon->id)->exists() ) return $this->failed(['name' => 'exists']);
+        $product = Product::find($req->product_id);
 
         $data = [
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
-            'vendor_id' => $this->integer($req->vendor_id),
+            'vendor_id' => $this->integer($req->vendor_id) ? $this->integer($req->vendor_id) : $product?->vendor_id,
             'client_id' => $this->integer($req->client_id),
             'name' => $this->string($req->name),
             'discount' => $this->float($req->discount),

@@ -30,8 +30,13 @@ class UserFactory extends Factory {
         return $this->state(function (array $attributes) {
 
             return [
-                'name' => 'Super',
+                'name' => 'Super Admin',
                 'email' => 'super@gmail.com',
+                'phone' => '+20 109 918 8572',
+                'language' => 'en',
+                'country' => 'EG',
+                'city' => 'Cairo',
+                'age' => '22',
                 'role' => 1,
                 'super' => true,
                 'supervisor' => true,

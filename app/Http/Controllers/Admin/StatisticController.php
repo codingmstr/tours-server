@@ -25,7 +25,6 @@ class StatisticController extends Controller {
         $confirmed_orders = $this->charts( Order::where('status', 'confirmed') );
         $cancelled_orders = $this->charts( Order::where('status', 'cancelled') );
         $reviews = $this->charts( Review::query() );
-
         $settings = Setting::where('id', 1)->first();
         
         $data = [

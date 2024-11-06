@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'super' => \App\Http\Middleware\Super::class,
             'clients' => \App\Http\Middleware\Clients::class,
             'vendors' => \App\Http\Middleware\Vendors::class,
+            'clients_wallet' => \App\Http\Middleware\ClientsWallet::class,
+            'vendors_wallet' => \App\Http\Middleware\VendorsWallet::class,
             'categories' => \App\Http\Middleware\Categories::class,
             'products' => \App\Http\Middleware\Products::class,
             'coupons' => \App\Http\Middleware\Coupons::class,

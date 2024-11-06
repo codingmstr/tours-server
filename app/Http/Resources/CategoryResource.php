@@ -32,11 +32,12 @@ class CategoryResource extends JsonResource {
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            'products' => count($this->products),
             'info' => ['name' => $this->name, 'image' => $image],
             'image' => $image,
             'vendor_id' => $this->vendor_id,
             'vendor' => UserResource::make( $this->vendor ),
+            'products' => count($this->products),
+            'rate' => $this->products?->flatMap(function ( $product ) { return $product->reviews?->pluck('rate'); })->avg() ?? 0,
         ];
 
     }

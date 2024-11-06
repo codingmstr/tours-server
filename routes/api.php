@@ -254,9 +254,22 @@ Route::prefix('admin')->group(function(){
                 Route::post('delete', 'App\Http\Controllers\Admin\ClientController@delete_group');
 
                 Route::prefix('{user}')->group(function(){
+
                     Route::post('', 'App\Http\Controllers\Admin\ClientController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\ClientController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\ClientController@delete');
+
+                    Route::middleware('clients_wallet')->group(function(){
+
+                        Route::prefix('wallet')->group(function(){
+                            Route::post('', 'App\Http\Controllers\Admin\WalletController@index');
+                            Route::post('deposit', 'App\Http\Controllers\Admin\WalletController@deposit');
+                            Route::post('withdraw', 'App\Http\Controllers\Admin\WalletController@withdraw');
+                            Route::post('convert', 'App\Http\Controllers\Admin\WalletController@convert');
+                        });
+
+                    });
+
                 });
 
             });
@@ -271,9 +284,22 @@ Route::prefix('admin')->group(function(){
                 Route::post('delete', 'App\Http\Controllers\Admin\VendorController@delete_group');
 
                 Route::prefix('{user}')->group(function(){
+
                     Route::post('', 'App\Http\Controllers\Admin\VendorController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\VendorController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\VendorController@delete');
+
+                    Route::middleware('vendors_wallet')->group(function(){
+
+                        Route::prefix('wallet')->group(function(){
+                            Route::post('', 'App\Http\Controllers\Admin\WalletController@index');
+                            Route::post('deposit', 'App\Http\Controllers\Admin\WalletController@deposit');
+                            Route::post('withdraw', 'App\Http\Controllers\Admin\WalletController@withdraw');
+                            Route::post('convert', 'App\Http\Controllers\Admin\WalletController@convert');
+                        });
+
+                    });
+
                 });
 
             });
@@ -359,6 +385,7 @@ Route::prefix('client')->group(function(){
             Route::prefix('message/{user}/{product}')->group(function(){
                 Route::post('', 'App\Http\Controllers\Client\MessageController@index');
                 Route::post('send', 'App\Http\Controllers\Client\MessageController@send');
+                Route::post('active', 'App\Http\Controllers\Client\MessageController@active');
             });
 
         });
@@ -368,6 +395,19 @@ Route::prefix('client')->group(function(){
                 Route::post('checkout', 'App\Http\Controllers\Client\OrderController@checkout');
             });
 
+        });
+        Route::prefix('pay')->group(function(){
+            Route::post('verify', 'App\Http\Controllers\Payment\VerifyController@index');
+            Route::post('stripe', 'App\Http\Controllers\Payment\StripeController@index');
+            Route::post('paytabs', 'App\Http\Controllers\Payment\PaytabsController@index');
+            Route::post('paymob', 'App\Http\Controllers\Payment\PaymobController@index');
+            Route::post('paypal', 'App\Http\Controllers\Payment\PaypalController@index');
+            Route::post('crypto', 'App\Http\Controllers\Payment\CryptoController@index');
+            Route::post('kashier', 'App\Http\Controllers\Payment\KashierController@index');
+            Route::post('wallet', 'App\Http\Controllers\Payment\KashierController@wallet');
+            Route::post('fawry', 'App\Http\Controllers\Payment\KashierController@wallet');
+            Route::post('payeer', 'App\Http\Controllers\Payment\PayeerController@index');
+            Route::post('perfect', 'App\Http\Controllers\Payment\PerfectController@index');
         });
 
     });
@@ -394,8 +434,54 @@ Route::prefix('client')->group(function(){
         Route::post('', 'App\Http\Controllers\Client\OrderController@index');
         Route::post('coupon', 'App\Http\Controllers\Client\OrderController@coupon');
     });
+    Route::prefix('webhook')->group(function(){
+        Route::post('stripe', 'App\Http\Controllers\Payment\StripeController@callback');
+        Route::post('paytabs', 'App\Http\Controllers\Payment\PaytabsController@callback');
+        Route::post('paymob', 'App\Http\Controllers\Payment\PaymobController@callback');
+        Route::post('paypal', 'App\Http\Controllers\Payment\PaypalController@callback');
+        Route::post('crypto', 'App\Http\Controllers\Payment\CryptoController@callback');
+        Route::post('kashier', 'App\Http\Controllers\Payment\KashierController@callback');
+        Route::post('payeer', 'App\Http\Controllers\Payment\PayeerController@callback');
+        Route::post('perfect', 'App\Http\Controllers\Payment\PerfectController@callback');
+    });
 
 });
+Route::prefix('client/old')->group(function(){
 
-// user ( postal field )
-// bookings histofy
+    Route::prefix('auth')->group(function(){
+
+        Route::post('register', 'App\Http\Controllers\Client\Old\AuthController@register');
+        Route::post('login', 'App\Http\Controllers\Client\Old\AuthController@login');
+        Route::post('recovery', 'App\Http\Controllers\Client\Old\AuthController@recovery');
+        Route::post('check-token/{token}', 'App\Http\Controllers\Client\Old\AuthController@check');
+        Route::post('change-password/{token}', 'App\Http\Controllers\Client\Old\AuthController@change');
+
+    });
+    Route::prefix('home')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\Old\HomeController@index');
+        Route::post('wishlist', 'App\Http\Controllers\Client\Old\HomeController@wishlist');
+        Route::post('search', 'App\Http\Controllers\Client\Old\HomeController@search');
+        Route::post('categories/{category}', 'App\Http\Controllers\Client\Old\HomeController@products');
+        Route::post('products/{product}', 'App\Http\Controllers\Client\Old\HomeController@product');
+        Route::post('products/{product}/coupon', 'App\Http\Controllers\Client\Old\OrderController@coupon');
+        Route::post('products/{product}/checkout', 'App\Http\Controllers\Client\Old\OrderController@checkout');
+
+        Route::middleware(['auth:sanctum', 'client'])->group(function(){
+            Route::post('account', 'App\Http\Controllers\Client\Old\HomeController@account');
+            Route::post('update-account', 'App\Http\Controllers\Client\Old\HomeController@update_account');
+            Route::post('reset-password', 'App\Http\Controllers\Client\Old\HomeController@reset_password');
+            Route::post('history', 'App\Http\Controllers\Client\Old\HomeController@history');
+            Route::post('update-history', 'App\Http\Controllers\Client\Old\HomeController@update_history');
+            Route::post('delete-history', 'App\Http\Controllers\Client\Old\HomeController@delete_history');
+
+            Route::middleware('messages')->group(function(){
+                Route::prefix('chat')->group(function(){
+                    Route::post('', 'App\Http\Controllers\Client\ChatController@index');
+                    Route::post('active', 'App\Http\Controllers\Client\ChatController@active');
+                    Route::post('send', 'App\Http\Controllers\Client\ChatController@send');
+                });
+            });
+        });
+    });
+
+});
