@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->integer('client_id')->default(0);
             $table->integer('product_id')->default(0);
             $table->integer('coupon_id')->default(0);
+            $table->integer('transaction_id')->default(0);
+            $table->integer('persons')->default(0);
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('address')->nullable();

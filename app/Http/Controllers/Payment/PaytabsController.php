@@ -63,7 +63,7 @@ class PaytabsController extends Controller {
             'headers' => ['authorization' => $this->serverKey],
         ]);
         $response = json_decode($response->getBody()->getContents(), true);
-        
+      
         Transaction::create([
             'user_id' => $this->user()->id,
             'transaction_id' => $response['tran_ref'],
@@ -71,6 +71,7 @@ class PaytabsController extends Controller {
             'currency' => 'USD',
             'payment' => 'paytabs',
             'method' => 'card',
+            'description' => json_encode($req->all()),
         ]);
 
         return $this->success(['url' => $response['redirect_url'], 'transaction_id' => $response['tran_ref']]);

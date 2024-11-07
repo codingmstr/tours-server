@@ -64,6 +64,7 @@ class KashierController extends Controller {
             'currency' => 'EGP',
             'payment' => 'kashier',
             'method' => $method ?? 'card',
+            'description' => json_encode($req->all()),
         ]);
 
         return $this->success(['url' => $paymentUrl, 'transaction_id' => $transaction_id]);

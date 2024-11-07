@@ -23,6 +23,7 @@ class TransactionResource extends JsonResource {
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
             'user_id' => $this->user_id,
             'user' => UserResource::make( $this->user ),
+            'order' => OrderResource::make( $this->order ),
         ];
 
     }

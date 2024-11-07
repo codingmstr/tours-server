@@ -18,6 +18,10 @@ use Vonage\Client\Credentials\Basic;
 use Vonage\SMS\Message\SMS;
 use GuzzleHttp\Client as ApiClient;
 use App\Events\Payment;
+use App\Http\Resources\TransactionResource;
+use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Order as MailOrder;
 
 abstract class Controller {
 
@@ -464,20 +468,41 @@ abstract class Controller {
 
     }
     public function transaction ( $data ) {
-
-        $transaction = Transaction::where('transaction_id', $data['transaction_id'])
-            ->where('status', 'pending')
-            ->where('active', true)
-            ->firstOrFail();
-
-        $user = User::findOrFail($transaction->user_id);
-        if ( $data['completed'] ) $user->update(['buy_balance' => $user->buy_balance + $transaction->amount ]);
-
-        $transaction->update(['status' => $data['completed'] ? 'successful' : 'failed']);
-        event(new Payment($user->id, $transaction));
         
-        $params = ['client_id' => $user->id, 'amount' => $transaction->amount, 'status' => $transaction->status];
-        $this->report(null, 'transaction', $transaction->id, 'deposit', '', $params);
+        $transaction = Transaction::where('transaction_id', $data['transaction_id'])->where('status', 'pending')->where('active', true)->firstOrFail();
+        $user = User::findOrFail($transaction->user_id);
+        
+        if ( !$data['completed'] ) return $transaction->update(['status' => 'failed']);
+        else $transaction->update(['status' => 'successful']);
+        
+        $details = json_decode($transaction->description);
+        $secret_key = $this->random_key();
+        while ( Order::where('secret_key', $secret_key)->exists() ) $secret_key = $this->random_key();
+
+        $data = [
+            'client_id' => $user->id,
+            'product_id' => $details->product_id,
+            'transaction_id' => $transaction->id,
+            'name' => $this->string($details->name),
+            'email' => $this->string($details->email),
+            'phone' => $this->string($details->phone),
+            'address' => $this->string($details->pick_up),
+            'notes' => $this->string($details->notes),
+            'persons' => $this->integer($details->adults),
+            'ordered_at' => $this->string($details->book_date) . ' ' . $this->string($details->book_time),
+            'price' => $transaction->amount,
+            'secret_key' => $secret_key,
+            'paid' => true,
+            'paid_at' => date('Y-m-d H:i:s'),
+            'status' => 'pending',
+            'active' => true,
+        ];
+
+        $order = Order::create($data);
+        $this->report(null, 'order', $order->id, 'add', 'client', ['price' => $order->price, 'paid' => $order->paid, 'status' => $order->status]);
+        event(new Payment($user->id, TransactionResource::make( $transaction )));
+        Mail::to($user->email)->queue(new MailOrder($user, $order));
+        return $this->success();
 
     }
 

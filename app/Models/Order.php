@@ -15,6 +15,8 @@ class Order extends Model {
         'client_id',
         'product_id',
         'coupon_id',
+        'transaction_id',
+        'persons',
         'name',
         'email',
         'address',
@@ -73,6 +75,11 @@ class Order extends Model {
     public function coupon () {
 
         return $this->belongsTo(Coupon::class);
+
+    }
+    public function transaction () {
+
+        return $this->belongsTo(Transaction::class);
 
     }
 

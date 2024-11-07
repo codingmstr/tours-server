@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\payment;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Transaction;
@@ -15,8 +16,9 @@ class VerifyController extends Controller {
             ->where('user_id', $this->user()->id)
             ->where('status', '!=', 'pending')
             ->where('active', true)
-            ->first();
+            ->firstOrFail();
 
+        $transaction = TransactionResource::make( $transaction );
         return $this->success(['transaction' => $transaction]);
 
     }

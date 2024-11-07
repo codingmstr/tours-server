@@ -96,6 +96,8 @@ class OrderController extends Controller {
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
             'notes' => $this->string($req->notes),
+            'persons' => $this->integer($req->adults),
+            'ordered_at' => $this->string($req->book_date) . ' ' . $this->string($req->book_time),
             'price' => $price,
             'secret_key' => $secret_key,
             'coupon_id' => $coupon?->id ?? 0,

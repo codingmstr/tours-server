@@ -26,6 +26,7 @@ class OrderResource extends JsonResource {
             'postal' => $this->postal,
             'notes' => $this->notes,
             'price' => $this->price,
+            'persons' => $this->persons,
             'coupon_discount' => $this->coupon_discount,
             'coupon_code' => $this->coupon_code,
             'secret_key' => $this->secret_key,

@@ -47,6 +47,7 @@ class PaypalController extends Controller {
             'currency' => 'USD',
             'payment' => 'paypal',
             'method' => 'wallet',
+            'description' => json_encode($req->all()),
         ]);
 
         return $this->success(['url' => $response['links'][1]['href']]);

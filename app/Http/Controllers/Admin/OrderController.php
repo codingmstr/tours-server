@@ -97,6 +97,7 @@ class OrderController extends Controller {
             'client_id' => $client->id,
             'vendor_id' => $product->vendor_id,
             'coupon_id' => $this->integer($req->coupon_id),
+            'persons' => $this->integer($req->persons),
             'name' => $this->string($req->name),
             'email' => $this->string($req->email),
             'address' => $this->string($req->address),

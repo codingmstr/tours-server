@@ -258,8 +258,8 @@
                                                                                 Your booking number : <span style="color: #00aa6c;">{{$order->id}}</span> <br>
                                                                                 Booking tour prices : <span style="color: #00aa6c;">${{$order->price}}</span> <br>
                                                                                 Booking status : @if ( $order->paid ) <span style="color: #00aa6c;">Paid successfully</span> @else <span style="color: #c91919;">Not paid yet</span> @endif <br>
-                                                                                your booking time : <span style="color: #00aa6c;">{{$order->created_at->format('Y-m-d')}}</span>
-                                                                                &nbsp; from pick up <span style="color: #00aa6c;">{{$order->pick_up ?? '--'}}</span>
+                                                                                your booking time : <span style="color: #00aa6c;">{{$order->ordered_at->format('Y-m-d H:i:s')}}</span>
+                                                                                &nbsp; from pick up <span style="color: #00aa6c;">{{$order->address ?? '--'}}</span>
                                                                             </span>
                                                                         </p>
 																	</div>

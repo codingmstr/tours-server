@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('method')->nullable();
             $table->string('currency')->nullable();
             $table->decimal('amount', 15, 2)->default(0);
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->enum('type', ['deposit', 'withdraw', 'transfer']);
             $table->enum('status', ['pending', 'successful', 'failed']);
             $table->boolean('active')->default(true);
