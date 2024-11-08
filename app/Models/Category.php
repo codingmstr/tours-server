@@ -13,7 +13,6 @@ class Category extends Model {
         'admin_id',
         'vendor_id',
         'name',
-        'slug',
         'company',
         'phone',
         'language',
@@ -29,6 +28,12 @@ class Category extends Model {
         'allow_coupons',
         'allow_reviews',
         'active',
+    ];
+    protected $casts = [
+        'name' => 'json',
+        'company' => 'json',
+        'location' => 'json',
+        'description' => 'json',
     ];
 
     public function admin () {

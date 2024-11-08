@@ -55,6 +55,16 @@ class Product extends Model {
         'expected' => 'json',
         'days' => 'json',
         'times' => 'json',
+        'name' => 'json',
+        'company' => 'json',
+        'location' => 'json',
+        'description' => 'json',
+        'details' => 'json',
+        'policy' => 'json',
+        'meeting' => 'json',
+        'rules' => 'json',
+        'availability' => 'json',
+        'more_info' => 'json',
     ];
 
     public function admin () {

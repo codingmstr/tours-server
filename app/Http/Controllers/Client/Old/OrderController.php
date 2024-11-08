@@ -87,7 +87,7 @@ class OrderController extends Controller {
             'product_id' => $product->id,
             'name' => $this->string($req->name),
             'email' => $this->string($req->email),
-            'address' => $this->string($req->address),
+            'address' => $this->string($req->pick_up),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
             'language' => $this->string($req->language),

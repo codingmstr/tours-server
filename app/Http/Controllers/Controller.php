@@ -280,7 +280,7 @@ abstract class Controller {
         $filters = $request->filters;
         $filter = $request->filter;
         $count = $table->count();
-        $name = $table->first()->getTable();
+        $name = $table->first()?->getTable();
         $items = $table->orderBy("id", $filter === 'oldest' ? 'asc' : 'desc');
 
         if ( $search ) {

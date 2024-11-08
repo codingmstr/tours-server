@@ -36,16 +36,12 @@ class CategoryController extends Controller {
     }
     public function store ( Request $req ) {
 
-        if ( Category::where('slug', $this->slug($req->name))->exists() ) {
+        if ( Category::where('name', $req->name)->exists() ) return $this->failed(['name' => 'exists']);
 
-            return $this->failed(['name' => 'exists']);
-
-        }
         $data = [
             'admin_id' => $this->user()->id,
             'vendor_id' => $this->integer($req->vendor_id),
             'name' => $this->string($req->name),
-            'slug' => $this->slug($req->name),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
             'location' => $this->string($req->location),
@@ -66,11 +62,8 @@ class CategoryController extends Controller {
     }
     public function update ( Request $req, Category $category ) {
 
-        if ( Category::where('slug', $this->slug($req->name))->where('id', '!=', $category->id)->exists() ) {
+        if ( Category::where('name', $req->name)->exists() ) return $this->failed(['name' => 'exists']);
 
-            return $this->failed(['name' => 'exists']);
-
-        }
         if ( $req->file('image_file') ) {
 
             $file_id = File::where('table', 'category')->where('column', $category->id)->first()?->id;
@@ -81,7 +74,6 @@ class CategoryController extends Controller {
         $data = [
             'vendor_id' => $this->integer($req->vendor_id),
             'name' => $this->string($req->name),
-            'slug' => $this->slug($req->name),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
             'location' => $this->string($req->location),

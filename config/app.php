@@ -22,6 +22,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'max_request_size' => env('MAX_REQUEST_SIZE', '40M'),
+    
     'previous_keys' => [
         ...array_filter(
             explode(',', env('APP_PREVIOUS_KEYS', ''))

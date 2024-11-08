@@ -29,10 +29,10 @@ class PaytabsController extends Controller {
         $data = [
             'profile_id' => $this->profileId,
             "cart_id"=> uniqid(),
-            'cart_amount' => $req->amount,
+            'cart_amount' => $this->exchange($req->amount, 'USD', 'EGP'),
             "return" => $req->redirect_url,
             "callback" => $this->callback_url,
-            "cart_currency" => "USD",
+            "cart_currency" => "EGP",
             "paypage_lang" => "en",
             "tran_type" => "sale",
             "tran_class" => "ecom",
